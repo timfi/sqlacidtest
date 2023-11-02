@@ -221,7 +221,60 @@ SELECT case when
     AND
     NOT (NULL AND x<0) then 'T' else 'F' end AS result
 FROM (VALUES (42)) AS t(x)
-) testcase(result) UNION ALL select index as test, 'T' as result from generate_series(16,260) s(index) 
+) testcase(result) UNION ALL select 16 as test, result from (
+-- sql/test016.sql
+
+SELECT
+  CASE WHEN
+        CAST(NULL AS CHARACTER) IS NULL
+    AND CAST(NULL AS NUMERIC) IS NULL
+    AND CAST(NULL AS DECIMAL) IS NULL
+    AND CAST(NULL AS SMALLINT) IS NULL
+    AND CAST(NULL AS INTEGER) IS NULL
+    AND CAST(NULL AS INT) IS NULL
+    AND CAST(NULL AS BIGINT) IS NULL
+    AND CAST(NULL AS FLOAT) IS NULL
+    AND CAST(NULL AS REAL) IS NULL
+    AND CAST(NULL AS DOUBLE PRECISION) IS NULL
+    AND CAST('T' AS BOOLEAN) <> CAST('F' AS BOOLEAN)
+  THEN 'T' ELSE 'F' END AS result
+) testcase(result) UNION ALL select 17 as test, result from (
+-- sql/test017.sql
+
+SELECT CASE WHEN T.HeLlO=t.hello THEN 'T' ELSE 'F' END AS result
+FROM (SELECT 42 AS hello) AS t
+) testcase(result) UNION ALL select 18 as test, result from (
+-- sql/test018.sql
+select case when (1=1      
+  AND 0 BETWEEN -1 AND 1
+  AND 0.99 BETWEEN 0 AND 1    
+                  
+  AND 0 BETWEEN 0 AND 0
+  AND 1 BETWEEN 0 AND 1
+  AND 0 BETWEEN 0 AND 1 
+                  
+  AND -0 BETWEEN -0 AND +0
+  AND -0.00 BETWEEN -0.00 AND +0.00
+       
+  AND 1.00 BETWEEN 0 AND 1.00           
+  AND NOT 1.01 BETWEEN 0 AND 1
+  
+  AND 'a' BETWEEN 'a' AND 'b'
+  AND 'ab' BETWEEN 'a' AND 'b'
+  AND 'b' BETWEEN 'a' AND 'b'
+  AND NOT 'bla' BETWEEN 'a' AND 'b'
+  
+  AND (NULL BETWEEN NULL AND NULL) IS NULL 
+  AND (NULL BETWEEN 0 AND NULL) IS NULL 
+  AND (0 BETWEEN 0 AND NULL) IS NULL 
+  AND (NULL BETWEEN 0 AND 1) IS NULL 
+  
+  
+  AND TRUE BETWEEN FALSE AND TRUE
+  AND FALSE BETWEEN FALSE AND TRUE
+    
+) then 'T' else 'F' end as result;
+) testcase(result) UNION ALL select index as test, 'T' as result from generate_series(19,260) s(index) 
 )
 -- render the result
 select case when state = 1048575 then image else 'XXXXXXXXXXXXXXXXXXXX' end as output from (values
