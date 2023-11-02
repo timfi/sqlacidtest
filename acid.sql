@@ -242,7 +242,7 @@ SELECT
 -- sql/test017.sql
 
 SELECT CASE WHEN T.HeLlO=t.hello THEN 'T' ELSE 'F' END AS result
-FROM (SELECT 42 AS hello) AS t
+FROM (VALUES (42)) AS t(hello)
 ) testcase(result) UNION ALL select 18 as test, result from (
 -- sql/test018.sql
 select case when (1=1      
@@ -274,7 +274,39 @@ select case when (1=1
   AND FALSE BETWEEN FALSE AND TRUE
     
 ) then 'T' else 'F' end as result;
-) testcase(result) UNION ALL select index as test, 'T' as result from generate_series(19,260) s(index) 
+) testcase(result) UNION ALL select 19 as test, result from (
+-- sql/test019.sql
+
+SELECT CASE WHEN (
+  CAST(' 1  ' AS NUMERIC) =  1   AND
+  CAST(' 1. ' AS NUMERIC) =  1.  AND
+  CAST(' 1.2' AS NUMERIC) =  1.2 AND
+  CAST('  .2' AS NUMERIC) =   .2 AND
+
+  CAST('+1  ' AS NUMERIC) = +1   AND
+  CAST('+1. ' AS NUMERIC) = +1.  AND
+  CAST('+1.2' AS NUMERIC) = +1.2 AND
+  CAST('+.2'  AS NUMERIC) =  +.2 AND
+
+  CAST('-1  ' AS NUMERIC) = -1   AND
+  CAST('-1. ' AS NUMERIC) = -1.  AND
+  CAST('-1.2' AS NUMERIC) = -1.2 AND
+  CAST('-.2'  AS NUMERIC) =  -.2 AND
+
+  CAST(' 1.2E3' AS NUMERIC) =  1.2E3 AND
+  CAST('+1.2E3' AS NUMERIC) = +1.2E3 AND
+  CAST('-1.2E3' AS NUMERIC) = -1.2E3 AND
+
+  CAST(' 1.2E+3' AS NUMERIC) =  1.2E+3 AND
+  CAST('+1.2E+3' AS NUMERIC) = +1.2E+3 AND
+  CAST('-1.2E+3' AS NUMERIC) = -1.2E+3 AND
+
+  CAST(' 1.2E-3' AS NUMERIC) =  1.2E-3 AND
+  CAST('+1.2E-3' AS NUMERIC) = +1.2E-3 AND
+  CAST('-1.2E-3' AS NUMERIC) = -1.2E-3
+) THEN 'T' ELSE 'F' END
+FROM (VALUES (1)) something
+) testcase(result) UNION ALL select index as test, 'T' as result from generate_series(20,260) s(index) 
 )
 -- render the result
 select case when state = 1048575 then image else 'XXXXXXXXXXXXXXXXXXXX' end as output from (values
